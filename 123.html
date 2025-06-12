@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة متوسط النتائج</title>
+    <style>
+        /* CSS Styles for a clean look */
+        body {
+            font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+            color: #333;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+        label.max-score-label {
+            color: #d93025; /* Reddish color for emphasis */
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            font-size: 18px;
+            text-align: center;
+            background-color: #f9f9f9;
+            box-sizing: border-box; /* Important for padding */
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        input:focus {
+            border-color: #1a73e8;
+        }
+        /* Style for the calculated result field */
+        input.result {
+            background-color: #e6f4ea; /* Light green */
+            font-weight: bold;
+            color: #2a7a3e;
+        }
+        button {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        p.note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>حاسبة متوسط النتائج</h1>
+        <p class="note">أدخل أي نتيجتين لحساب الثالثة تلقائياً.</p>
+        
+        <div class="input-group">
+            <label for="maxScore" class="max-score-label">أولاً: الدرجة النهائية للمادة (لكل ترم)</label>
+            <input type="number" id="maxScore" placeholder="مثال: 100 أو 250">
+        </div>
+        
+        <hr style="border: 1px solid #eee; margin: 25px 0;">
+
+        <div class="input-group">
+            <label for="term1">نتيجة الفصل الدراسي الأول</label>
+            <input type="number" id="term1" placeholder="0">
+        </div>
+        
+        <div class="input-group">
+            <label for="term2">نتيجة الفصل الدراسي الثاني</label>
+            <input type="number" id="term2" placeholder="0">
+        </div>
+        
+        <div class="input-group">
+            <label for="finalAvg">النتيجة النهائية (المتوسط)</label>
+            <input type="number" id="finalAvg" placeholder="0">
+        </div>
+
+        <button id="clearBtn">مسح الكل</button>
+    </div>
+
+    <script>
+        const maxScoreInput = document.getElementById('maxScore');
+        const term1Input = document.getElementById('term1');
+        const term2Input = document.getElementById('term2');
+        const finalAvgInput = document.getElementById('finalAvg');
+        const clearBtn = document.getElementById('clearBtn');
+
+        const calculationInputs = [term1Input, term2Input, finalAvgInput];
+
+        // Function to update max values and placeholders
+        function updateMaxValues() {
+            const maxVal = maxScoreInput.value;
+            if (maxVal) {
+                calculationInputs.forEach(input => {
+                    input.max = maxVal;
+                    // Optional: You can check if entered value exceeds max
+                });
+            }
+        }
+
+        // The main calculation function
+        function calculate() {
+            // Clear previous result styling
+            calculationInputs.forEach(input => input.classList.remove('result'));
+
+            const t1 = parseFloat(term1Input.value);
+            const t2 = parseFloat(term2Input.value);
+            const avg = parseFloat(finalAvgInput.value);
+
+            // Case 1: Calculate Final Average from T1 and T2
+            if (!isNaN(t1) && !isNaN(t2)) {
+                const result = (t1 + t2) / 2;
+                finalAvgInput.value = parseFloat(result.toFixed(2)); // Round to 2 decimal places
+                finalAvgInput.classList.add('result');
+            } 
+            // Case 2: Calculate Term 2 from Final Average and T1
+            else if (!isNaN(avg) && !isNaN(t1)) {
+                const result = (avg * 2) - t1;
+                term2Input.value = parseFloat(result.toFixed(2));
+                term2Input.classList.add('result');
+            } 
+            // Case 3: Calculate Term 1 from Final Average and T2
+            else if (!isNaN(avg) && !isNaN(t2)) {
+                const result = (avg * 2) - t1;
+                term1Input.value = parseFloat(result.toFixed(2));
+                term1Input.classList.add('result');
+            }
+        }
+
+        // Function to clear all fields
+        function clearFields() {
+            maxScoreInput.value = '';
+            calculationInputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('result');
+                input.removeAttribute('max'); // Remove max attribute on clear
+            });
+        }
+
+        // Add event listeners
+        maxScoreInput.addEventListener('input', updateMaxValues);
+        calculationInputs.forEach(input => input.addEventListener('input', calculate));
+        clearBtn.addEventListener('click', clearFields);
+    </script>
+
+</body>
+</html>
