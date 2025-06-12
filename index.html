@@ -195,9 +195,8 @@
         const finalAvgPercentage = document.getElementById('finalAvg-percentage');
         const finalAvgLostMarks = document.getElementById('finalAvg-lost-marks');
 
-        // --- دالة "المترجم" الجديدة لتحويل الأرقام ---
         function toWesternArabicNumerals(str) {
-            if (!str) return ''; // لو النص فارغ، قم بإرجاع نص فارغ
+            if (!str) return '';
             let result = String(str);
             const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
             const westernNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -214,7 +213,6 @@
                 { input: term2Input, perc: term2Percentage, lost: term2LostMarks },
                 { input: finalAvgInput, perc: finalAvgPercentage, lost: finalAvgLostMarks }
             ];
-
             detailsMap.forEach(item => {
                 const score = parseFloat(toWesternArabicNumerals(item.input.value));
                 item.perc.textContent = '';
@@ -230,20 +228,22 @@
 
         function validateInput(event) {
             const input = event.target;
-            const westernValue = toWesternArabicNumerals(input.value); // التحويل أولاً
+            const westernValue = toWesternArabicNumerals(input.value);
             const maxVal = parseFloat(toWesternArabicNumerals(maxScoreInput.value));
             if (parseFloat(westernValue) < 0) {
-                input.value = '۰'; // إرجاع القيمة لصفر بالعربي
+                input.value = '۰';
             }
             if (!isNaN(maxVal) && maxVal > 0 && parseFloat(westernValue) > maxVal) {
-                input.value = maxScoreInput.value; // إرجاع القيمة للدرجة النهائية
+                input.value = maxScoreInput.value;
             }
             updateDetails();
         }
         
+        // --- الدالة التي تم إصلاحها ---
         function performCalculation() {
             calculationInputs.forEach(input => input.classList.remove('result'));
             
+            // استخدام "مترجم" الأرقام العربية هنا أيضاً
             const t1 = parseFloat(toWesternArabicNumerals(term1Input.value));
             const t2 = parseFloat(toWesternArabicNumerals(term2Input.value));
             const avg = parseFloat(toWesternArabicNumerals(finalAvgInput.value));
