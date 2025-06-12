@@ -239,14 +239,14 @@
             updateDetails();
         }
         
-        // --- الدالة التي تم إصلاحها ---
         function performCalculation() {
             calculationInputs.forEach(input => input.classList.remove('result'));
             
-            // استخدام "مترجم" الأرقام العربية هنا أيضاً
+            // --- هذا هو الجزء الذي تم إصلاحه ---
             const t1 = parseFloat(toWesternArabicNumerals(term1Input.value));
             const t2 = parseFloat(toWesternArabicNumerals(term2Input.value));
             const avg = parseFloat(toWesternArabicNumerals(finalAvgInput.value));
+            // --- نهاية الجزء الذي تم إصلاحه ---
             
             const filledInputs = [];
             if (!isNaN(t1)) filledInputs.push('t1');
