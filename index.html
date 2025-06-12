@@ -30,6 +30,18 @@
             margin-bottom: 10px;
             font-size: 24px;
         }
+        /* --- تنسيق جديد للتنويه --- */
+        .warning-note {
+            background-color: #fff3cd; /* أصفر فاتح */
+            color: #856404;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+            line-height: 1.5;
+        }
         .input-group {
             margin-bottom: 15px;
             text-align: right;
@@ -138,18 +150,19 @@
 
     <div class="container">
         <h1>حاسبة وتحليل النتائج</h1>
-        <p class="note">أدخل الدرجات ثم اضغط "احسب".</p>
+        
+        <p class="warning-note">⚠️ **تنويه هام:** لضمان عمل الآلة الحاسبة، يرجى استخدام الأرقام الإنجليزية فقط (0, 1, 2, 3...).</p>
         
         <div class="input-group">
             <label for="maxScore" class="max-score-label">أولاً: الدرجة النهائية للمادة (لكل ترم)</label>
-            <input type="number" id="maxScore" placeholder="مثال: ۱۰۰" min="0">
+            <input type="number" id="maxScore" placeholder="مثال: 100" min="0">
         </div>
         
         <hr style="border: 1px solid #eee; margin: 25px 0;">
 
         <div class="input-group">
             <label for="term1">نتيجة الفصل الدراسي الأول</label>
-            <input type="number" id="term1" placeholder="۰" min="0">
+            <input type="number" id="term1" placeholder="0" min="0">
             <div class="details-container">
                 <span class="percentage" id="term1-percentage"></span>
                 <span class="lost-marks" id="term1-lost-marks"></span>
@@ -158,7 +171,7 @@
         
         <div class="input-group">
             <label for="term2">نتيجة الفصل الدراسي الثاني</label>
-            <input type="number" id="term2" placeholder="۰" min="0">
+            <input type="number" id="term2" placeholder="0" min="0">
             <div class="details-container">
                 <span class="percentage" id="term2-percentage"></span>
                 <span class="lost-marks" id="term2-lost-marks"></span>
@@ -167,7 +180,7 @@
         
         <div class="input-group">
             <label for="finalAvg">نتيجة الفصلين</label>
-            <input type="number" id="finalAvg" placeholder="۰" min="0">
+            <input type="number" id="finalAvg" placeholder="0" min="0">
             <div class="details-container">
                 <span class="percentage" id="finalAvg-percentage"></span>
                 <span class="lost-marks" id="finalAvg-lost-marks"></span>
@@ -195,26 +208,17 @@
         const finalAvgPercentage = document.getElementById('finalAvg-percentage');
         const finalAvgLostMarks = document.getElementById('finalAvg-lost-marks');
 
-        function toWesternArabicNumerals(str) {
-            if (!str) return '';
-            let result = String(str);
-            const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-            const westernNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-            for (let i = 0; i < 10; i++) {
-                result = result.replace(new RegExp(arabicNumerals[i], 'g'), westernNumerals[i]);
-            }
-            return result;
-        }
-
+        // الكود الآن مبسط وبدون دالة الترجمة
+        
         function updateDetails() {
-            const maxVal = parseFloat(toWesternArabicNumerals(maxScoreInput.value));
+            const maxVal = parseFloat(maxScoreInput.value);
             const detailsMap = [
                 { input: term1Input, perc: term1Percentage, lost: term1LostMarks },
                 { input: term2Input, perc: term2Percentage, lost: term2LostMarks },
                 { input: finalAvgInput, perc: finalAvgPercentage, lost: finalAvgLostMarks }
             ];
             detailsMap.forEach(item => {
-                const score = parseFloat(toWesternArabicNumerals(item.input.value));
+                const score = parseFloat(item.input.value);
                 item.perc.textContent = '';
                 item.lost.textContent = '';
                 if (!isNaN(score) && !isNaN(maxVal) && maxVal > 0) {
@@ -228,13 +232,12 @@
 
         function validateInput(event) {
             const input = event.target;
-            const westernValue = toWesternArabicNumerals(input.value);
-            const maxVal = parseFloat(toWesternArabicNumerals(maxScoreInput.value));
-            if (parseFloat(westernValue) < 0) {
-                input.value = '۰';
+            const maxVal = parseFloat(maxScoreInput.value);
+            if (parseFloat(input.value) < 0) {
+                input.value = 0;
             }
-            if (!isNaN(maxVal) && maxVal > 0 && parseFloat(westernValue) > maxVal) {
-                input.value = maxScoreInput.value;
+            if (!isNaN(maxVal) && maxVal > 0 && parseFloat(input.value) > maxVal) {
+                input.value = maxVal;
             }
             updateDetails();
         }
@@ -242,11 +245,9 @@
         function performCalculation() {
             calculationInputs.forEach(input => input.classList.remove('result'));
             
-            // --- هذا هو الجزء الذي تم إصلاحه ---
-            const t1 = parseFloat(toWesternArabicNumerals(term1Input.value));
-            const t2 = parseFloat(toWesternArabicNumerals(term2Input.value));
-            const avg = parseFloat(toWesternArabicNumerals(finalAvgInput.value));
-            // --- نهاية الجزء الذي تم إصلاحه ---
+            const t1 = parseFloat(term1Input.value);
+            const t2 = parseFloat(term2Input.value);
+            const avg = parseFloat(finalAvgInput.value);
             
             const filledInputs = [];
             if (!isNaN(t1)) filledInputs.push('t1');
@@ -262,7 +263,7 @@
                 const result = (t1 + t2) / 2;
                 finalAvgInput.value = result.toFixed(2);
                 finalAvgInput.classList.add('result');
-                const maxVal = parseFloat(toWesternArabicNumerals(maxScoreInput.value));
+                const maxVal = parseFloat(maxScoreInput.value);
                 if (!isNaN(maxVal) && maxVal > 0 && result > (maxVal / 2)) {
                     setTimeout(() => alert("🎉 مبروك النجاح! 🎉"), 100);
                 }
