@@ -199,4 +199,99 @@
         function toWesternArabicNumerals(str) {
             if (!str) return ''; // لو النص فارغ، قم بإرجاع نص فارغ
             let result = String(str);
-            const arabicNumerals = ['٠
+            const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+            const westernNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            for (let i = 0; i < 10; i++) {
+                result = result.replace(new RegExp(arabicNumerals[i], 'g'), westernNumerals[i]);
+            }
+            return result;
+        }
+
+        function updateDetails() {
+            const maxVal = parseFloat(toWesternArabicNumerals(maxScoreInput.value));
+            const detailsMap = [
+                { input: term1Input, perc: term1Percentage, lost: term1LostMarks },
+                { input: term2Input, perc: term2Percentage, lost: term2LostMarks },
+                { input: finalAvgInput, perc: finalAvgPercentage, lost: finalAvgLostMarks }
+            ];
+
+            detailsMap.forEach(item => {
+                const score = parseFloat(toWesternArabicNumerals(item.input.value));
+                item.perc.textContent = '';
+                item.lost.textContent = '';
+                if (!isNaN(score) && !isNaN(maxVal) && maxVal > 0) {
+                    const percentage = (score / maxVal) * 100;
+                    const lostMarks = maxVal - score;
+                    item.perc.textContent = `النسبة: ${percentage.toFixed(1)}%`;
+                    item.lost.textContent = `الدرجات المفقودة: ${lostMarks.toFixed(2)}`;
+                }
+            });
+        }
+
+        function validateInput(event) {
+            const input = event.target;
+            const westernValue = toWesternArabicNumerals(input.value); // التحويل أولاً
+            const maxVal = parseFloat(toWesternArabicNumerals(maxScoreInput.value));
+            if (parseFloat(westernValue) < 0) {
+                input.value = '۰'; // إرجاع القيمة لصفر بالعربي
+            }
+            if (!isNaN(maxVal) && maxVal > 0 && parseFloat(westernValue) > maxVal) {
+                input.value = maxScoreInput.value; // إرجاع القيمة للدرجة النهائية
+            }
+            updateDetails();
+        }
+        
+        function performCalculation() {
+            calculationInputs.forEach(input => input.classList.remove('result'));
+            
+            const t1 = parseFloat(toWesternArabicNumerals(term1Input.value));
+            const t2 = parseFloat(toWesternArabicNumerals(term2Input.value));
+            const avg = parseFloat(toWesternArabicNumerals(finalAvgInput.value));
+            
+            const filledInputs = [];
+            if (!isNaN(t1)) filledInputs.push('t1');
+            if (!isNaN(t2)) filledInputs.push('t2');
+            if (!isNaN(avg)) filledInputs.push('avg');
+
+            if (filledInputs.length !== 2) {
+                alert("الرجاء إدخال نتيجتين فقط لحساب الثالثة.");
+                return;
+            }
+
+            if (filledInputs.includes('t1') && filledInputs.includes('t2')) {
+                const result = (t1 + t2) / 2;
+                finalAvgInput.value = result.toFixed(2);
+                finalAvgInput.classList.add('result');
+                const maxVal = parseFloat(toWesternArabicNumerals(maxScoreInput.value));
+                if (!isNaN(maxVal) && maxVal > 0 && result > (maxVal / 2)) {
+                    setTimeout(() => alert("🎉 مبروك النجاح! 🎉"), 100);
+                }
+            } else if (filledInputs.includes('avg') && filledInputs.includes('t1')) {
+                const result = (avg * 2) - t1;
+                term2Input.value = result.toFixed(2);
+                term2Input.classList.add('result');
+            } else if (filledInputs.includes('avg') && filledInputs.includes('t2')) {
+                const result = (avg * 2) - t2;
+                term1Input.value = result.toFixed(2);
+                term1Input.classList.add('result');
+            }
+            updateDetails();
+        }
+
+        function clearFields() {
+            maxScoreInput.value = '';
+            calculationInputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('result');
+            });
+            updateDetails();
+        }
+
+        calculateBtn.addEventListener('click', performCalculation);
+        clearBtn.addEventListener('click', clearFields);
+        calculationInputs.forEach(input => input.addEventListener('input', validateInput));
+        maxScoreInput.addEventListener('input', updateDetails);
+    </script>
+
+</body>
+</html>
