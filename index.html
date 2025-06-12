@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>حاسبة متوسط النتائج</title>
+    <title>حاسبة وتحليل النتائج</title>
     <style>
         body {
             font-family: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -18,11 +18,11 @@
         }
         .container {
             background-color: #ffffff;
-            padding: 30px 40px;
+            padding: 25px 35px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
         }
         h1 {
@@ -31,7 +31,7 @@
             font-size: 24px;
         }
         .input-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: right;
         }
         label {
@@ -62,6 +62,22 @@
             background-color: #e6f4ea;
             font-weight: bold;
             color: #2a7a3e;
+        }
+        .details-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 5px;
+            font-size: 13px;
+            height: 20px;
+        }
+        .percentage {
+            color: #28a745;
+            font-weight: 600;
+        }
+        .lost-marks {
+            color: #dc3545;
+            font-weight: 600;
         }
         .button-group {
             display: flex;
@@ -121,29 +137,41 @@
     </div>
 
     <div class="container">
-        <h1>حاسبة متوسط النتائج</h1>
-        <p class="note">أدخل أي نتيجتين ثم اضغط "احسب".</p>
+        <h1>حاسبة وتحليل النتائج</h1>
+        <p class="note">أدخل الدرجات ثم اضغط "احسب".</p>
         
         <div class="input-group">
             <label for="maxScore" class="max-score-label">أولاً: الدرجة النهائية للمادة (لكل ترم)</label>
-            <input type="number" id="maxScore" placeholder="مثال: 100" min="0">
+            <input type="number" id="maxScore" placeholder="مثال: ۱۰۰" min="0">
         </div>
         
         <hr style="border: 1px solid #eee; margin: 25px 0;">
 
         <div class="input-group">
             <label for="term1">نتيجة الفصل الدراسي الأول</label>
-            <input type="number" id="term1" placeholder="0" min="0">
+            <input type="number" id="term1" placeholder="۰" min="0">
+            <div class="details-container">
+                <span class="percentage" id="term1-percentage"></span>
+                <span class="lost-marks" id="term1-lost-marks"></span>
+            </div>
         </div>
         
         <div class="input-group">
             <label for="term2">نتيجة الفصل الدراسي الثاني</label>
-            <input type="number" id="term2" placeholder="0" min="0">
+            <input type="number" id="term2" placeholder="۰" min="0">
+            <div class="details-container">
+                <span class="percentage" id="term2-percentage"></span>
+                <span class="lost-marks" id="term2-lost-marks"></span>
+            </div>
         </div>
         
         <div class="input-group">
             <label for="finalAvg">نتيجة الفصلين</label>
-            <input type="number" id="finalAvg" placeholder="0" min="0">
+            <input type="number" id="finalAvg" placeholder="۰" min="0">
+            <div class="details-container">
+                <span class="percentage" id="finalAvg-percentage"></span>
+                <span class="lost-marks" id="finalAvg-lost-marks"></span>
+            </div>
         </div>
 
         <div class="button-group">
@@ -160,77 +188,15 @@
         const clearBtn = document.getElementById('clearBtn');
         const calculateBtn = document.getElementById('calculateBtn');
         const calculationInputs = [term1Input, term2Input, finalAvgInput];
+        const term1Percentage = document.getElementById('term1-percentage');
+        const term1LostMarks = document.getElementById('term1-lost-marks');
+        const term2Percentage = document.getElementById('term2-percentage');
+        const term2LostMarks = document.getElementById('term2-lost-marks');
+        const finalAvgPercentage = document.getElementById('finalAvg-percentage');
+        const finalAvgLostMarks = document.getElementById('finalAvg-lost-marks');
 
-        function validateInput(event) {
-            const input = event.target;
-            const maxVal = parseFloat(maxScoreInput.value);
-
-            if (parseFloat(input.value) < 0) {
-                input.value = 0;
-            }
-            if (!isNaN(maxVal) && maxVal > 0) {
-                if (parseFloat(input.value) > maxVal) {
-                    input.value = maxVal;
-                }
-            }
-        }
-        
-        function performCalculation() {
-            calculationInputs.forEach(input => input.classList.remove('result'));
-            
-            const t1 = parseFloat(term1Input.value);
-            const t2 = parseFloat(term2Input.value);
-            const avg = parseFloat(finalAvgInput.value);
-            
-            const filledInputs = [];
-            if (!isNaN(t1)) filledInputs.push('t1');
-            if (!isNaN(t2)) filledInputs.push('t2');
-            if (!isNaN(avg)) filledInputs.push('avg');
-
-            if (filledInputs.length !== 2) {
-                alert("الرجاء إدخال نتيجتين فقط لحساب الثالثة.");
-                return;
-            }
-
-            if (filledInputs.includes('t1') && filledInputs.includes('t2')) {
-                const result = (t1 + t2) / 2;
-                finalAvgInput.value = parseFloat(result.toFixed(2));
-                finalAvgInput.classList.add('result');
-
-                const maxVal = parseFloat(maxScoreInput.value);
-                if (!isNaN(maxVal) && maxVal > 0 && result > (maxVal / 2)) {
-                    setTimeout(() => {
-                        alert("🎉 مبروك النجاح! 🎉");
-                    }, 100);
-                }
-            } 
-            else if (filledInputs.includes('avg') && filledInputs.includes('t1')) {
-                const result = (avg * 2) - t1;
-                term2Input.value = parseFloat(result.toFixed(2));
-                term2Input.classList.add('result');
-            } 
-            else if (filledInputs.includes('avg') && filledInputs.includes('t2')) {
-                const result = (avg * 2) - t2;
-                term1Input.value = parseFloat(result.toFixed(2));
-                term1Input.classList.add('result');
-            }
-        }
-
-        function clearFields() {
-            maxScoreInput.value = '';
-            calculationInputs.forEach(input => {
-                input.value = '';
-                input.classList.remove('result');
-            });
-        }
-
-        calculateBtn.addEventListener('click', performCalculation);
-        clearBtn.addEventListener('click', clearFields);
-        calculationInputs.forEach(input => input.addEventListener('input', validateInput));
-        maxScoreInput.addEventListener('input', (event) => {
-            calculationInputs.forEach(input => validateInput({ target: input }));
-        });
-    </script>
-
-</body>
-</html>
+        // --- دالة "المترجم" الجديدة لتحويل الأرقام ---
+        function toWesternArabicNumerals(str) {
+            if (!str) return ''; // لو النص فارغ، قم بإرجاع نص فارغ
+            let result = String(str);
+            const arabicNumerals = ['٠
